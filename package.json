@@ -1,6 +1,6 @@
 {
   "name": "coc-jira-cplt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "harshanarayana",
   "license": "MIT",
   "repository": {
@@ -17,9 +17,17 @@
     "coc": ">=0.0.57"
   },
   "activationEvents": [
-    "*"
+    "onLanguage:gitcommit",
+    "onCommand:jira.issues"
   ],
   "contributes": {
+    "commands": [
+      {
+        "title": "Pull JIRA Issue List",
+        "category": "jira",
+        "command": "jira.issues"
+      }
+    ],
     "configuration": {
       "type": "object",
       "properties": {

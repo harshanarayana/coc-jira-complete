@@ -1,4 +1,4 @@
-const { sources, workspace } = require('coc.nvim')
+const { sources, workspace, commands } = require('coc.nvim')
 const jc = require('jira-connector')
 
 /**
@@ -21,6 +21,10 @@ const fetchIssues = (url, user, password) => {
     key: issue.key,
     title: issue.fields.summary,
   })))
+}
+
+async function listIssues(url, user, password) {
+  return await fetchIssues(url, user, password)
 }
 
 exports.activate = async context => {
@@ -64,4 +68,5 @@ exports.activate = async context => {
     }
   }
   context.subscriptions.push(sources.createSource(source))
+  context.subscriptions.push(commands.registerCommand("jira.issues", () => listIssues(url, user, password)))
 }
