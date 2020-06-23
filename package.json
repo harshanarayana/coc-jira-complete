@@ -1,11 +1,11 @@
 {
-  "name": "coc-jira-complete",
-  "version": "1.0.2",
-  "author": "jberglinds",
+  "name": "coc-jira-cplt",
+  "version": "0.1.0",
+  "author": "harshanarayana",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jberglinds/coc-jira-complete"
+    "url": "https://github.com/harshanarayana/coc-jira-complete"
   },
   "main": "index.js",
   "keywords": [
@@ -23,27 +23,27 @@
     "configuration": {
       "type": "object",
       "properties": {
-        "jira.workspaceUrl": {
+        "j.url": {
           "type": "string",
           "default": "",
           "description": "The url of the JIRA workspace"
         },
-        "jira.user.email": {
+        "j.user": {
           "type": "string",
           "default": "",
           "description": "JIRA user email"
         },
-        "jira.user.apiKey": {
+        "j.password": {
           "type": "string",
           "default": "",
-          "description": "JIRA user api key, get one from id.atlassian.com/manage/api-tokens"
+          "description": "Base64 Encoded Password"
         }
       }
     }
   },
   "dependencies": {
     "coc.nvim": "^0.0.73",
-    "node-fetch": "^2.6.0"
+    "jira-connector": "^3.1.0"
   },
   "devDependencies": {
     "prettier": "^1.18.2"

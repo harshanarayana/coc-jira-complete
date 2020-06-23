@@ -1,38 +1,36 @@
 const { sources, workspace } = require('coc.nvim')
-const fetch = require('node-fetch')
+const jc = require('jira-connector')
 
 /**
  * Fetches unresolved JIRA issues for a user
  */
-const fetchIssues = (workspaceUrl, email, apiKey) => {
-  const auth = Buffer.from(`${email}:${apiKey}`).toString('base64')
-  const headers = new fetch.Headers({
-    Authorization: `Basic ${auth}`
+const fetchIssues = (url, user, password) => {
+  let c = new jc({
+    protocol: "https",
+    host: url,
+    basic_auth: {
+      username: user,
+      password: password,
+    },
   })
-  const username = email.replace('@', '\\u0040') // Escape @ character
-  const query = `assignee=${username}+and+resolution=unresolved`
-  const fields = 'summary,updated'
-  return fetch(
-    `${workspaceUrl}/rest/api/2/search?jql=${query}&fields=${fields}`,
-    { headers }
-  )
-    .then(res => res.json())
-    .then(json =>
-      json.issues.map(issue => ({
-        key: issue.key,
-        title: issue.fields.summary
-      }))
-    )
+
+  return c.search.search({
+    jql: `assignee=${user} AND resolution = Unresolved order by updated DESC`,
+    fields: ["summary", "description", "updated"]
+  }).then(issues => issues.issues.map( issue => ({
+    key: issue.key,
+    title: issue.fields.summary,
+  })))
 }
 
 exports.activate = async context => {
-  const config = workspace.getConfiguration('jira')
+  const config = workspace.getConfiguration('j')
 
-  const workspaceUrl = config.get('workspaceUrl')
-  const email = config.get('user.email')
-  const apiKey = config.get('user.apiKey')
+  const url = config.get('url')
+  const user = config.get('user')
+  const password = config.get('password')
 
-  if (!workspaceUrl || !email || !apiKey) {
+  if (!url || !user || !password) {
     workspace.showMessage(
       'JIRA configuration missing from :CocConfig',
       'warning'
@@ -42,17 +40,17 @@ exports.activate = async context => {
 
   let issues = []
   try {
-    issues = await fetchIssues(workspaceUrl, email, apiKey)
+    issues = await fetchIssues(url, user, password)
   } catch (error) {
     workspace.showMessage(
-      'Failed to fetch JIRA issues, check :CocOpenLog',
+      '[coc-jira-cplt] Failed to fetch JIRA issues, check :CocOpenLog',
       'error'
     )
     console.error('Failed to fetch JIRA issues: ', error)
   }
 
   let source = {
-    name: 'jira-complete',
+    name: 'jira-cplt',
     triggerOnly: false,
     doComplete: async () => {
       return {
